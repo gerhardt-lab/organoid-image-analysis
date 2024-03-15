@@ -1,0 +1,11 @@
+
+
+
+number_of_vertical_tiles: 3
+
+extend_x: 5000
+extend_y: 5000
+
+n_sample: 1000
+
+pixel_to_micron_ratio: 1.0

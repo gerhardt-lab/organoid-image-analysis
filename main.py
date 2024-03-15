@@ -207,7 +207,7 @@ for index, row in key_file.iterrows():
         plt.close()
 
         for label in np.unique(all_ECs):
-            single_nucleus = np.where(siScr_green == label, 1, 0)
+            single_nucleus = np.where(img_labels == label, 1, 0)
             regions = regionprops(single_nucleus)
             for props in regions:
                 y0, x0 = props.centroid
@@ -221,7 +221,7 @@ for index, row in key_file.iterrows():
             if label in np.unique(siScr_orange):
                 results_df.at[counter,"color"] = "orange"
                 results_df.at[counter,"siRNA"] = row["orange"]
-            else:
+            elif label in np.unique(siScr_green):
                 results_df.at[counter,"color"] = "green"
                 results_df.at[counter,"siRNA"] = row["green"]
             results_df.at[counter,"filename"] = row["filename"]
