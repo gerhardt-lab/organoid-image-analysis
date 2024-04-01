@@ -1,9 +1,6 @@
 
 
-
-
-
-def nuclei_quant(parameters):
+def pixel_quant(parameters):
     
     print("Nuclei segmentation")
     # load key file
