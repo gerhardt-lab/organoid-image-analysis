@@ -1,11 +1,11 @@
 #image parameters
 pixel_to_micron_ratio: 1.0
 
-channel_nuclei: 0 		# channel for nuclei, optional
-channel_EC_junction: 1 	# commonly the VE-cadherin marker
-channel_siRNA: 2		# channel for siRNA marker, optional
+channel_nuclei: 0  # channel for nuclei, optional
+channel_EC_junction: 1  # commonly the VE-cadherin marker
+channel_siRNA: 2  # channel for siRNA marker, optional
 
-# device geometry / setup
+# device geometry or setup
 
 use_automated_segmentation: False # if True, use the segment anything model to segment the device geometry, if False, create a binary mask of the device geometry and add _device_mask to the filename before the filename extension. Example file.tif -> add file_device_mask.tif
 

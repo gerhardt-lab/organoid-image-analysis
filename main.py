@@ -95,11 +95,11 @@ for index, row in key_file.iterrows():
     n_sample = parameters["n_sample"]
     sample_counter = 0
 
-    thresh_vecad = threshold_otsu(img[:,:,1])
-    binary_vecad = img[:,:,1] > thresh_vecad
+    thresh_vecad = threshold_otsu(img[:,:,parameters["channel_EC_junction"]])
+    binary_vecad = img[:,:,parameters["channel_EC_junction"]] > thresh_vecad
 
-    thresh_orange = threshold_otsu(img[:,:,2])
-    binary_orange = img[:,:,2] > thresh_orange
+    thresh_orange = threshold_otsu(img[:,:,parameters["channel_siRNA"]])
+    binary_orange = img[:,:,parameters["channel_siRNA"]] > thresh_orange
 
     while sample_counter < n_sample:
         x = np.random.randint(0, img.shape[1])
@@ -143,42 +143,45 @@ for index, row in key_file.iterrows():
 
         img_nuclei = img_tile[:,:,0]
         fig, ax = plt.subplots()
-        ax.imshow(img_nuclei)
+        ax.imshow(img_nuclei, cmap="Grays")
+        ax.axis("off")
         filepath_out = parameters["output_folder"] + row["filename"] + "-" + str(k) + ".png"
         plt.savefig(filepath_out)
         plt.close()
 
         fig, ax = plt.subplots()
-        ax.imshow(normalize(img_nuclei))
+        ax.imshow(normalize(img_nuclei), cmap="Grays")
+        ax.axis("off")
         filepath_out = parameters["output_folder"] + row["filename"] + "-" + str(k) + "-normalized.png"
         plt.savefig(filepath_out)
         plt.close()
 
         img_labels, details = model.predict_instances(normalize(img_nuclei), n_tiles = model._guess_n_tiles(img_nuclei))
         
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize= (10,10))
         ax.imshow(img_labels)
+        ax.axis("off")
         filepath_out = parameters["output_folder"] + row["filename"] + "-" + str(k) + "-lables.png"
         plt.savefig(filepath_out)
         plt.close()
 
-        thresh_vecad = threshold_otsu(img_tile[:,:,1])
-        binary_vecad = img_tile[:,:,1] > thresh_vecad
+        thresh_vecad = threshold_otsu(img_tile[:,:,parameters["channel_EC_junction"]])
+        binary_vecad = img_tile[:,:,parameters["channel_EC_junction"]] > thresh_vecad
 
         fig, ax = plt.subplots(figsize= (10,10))
         ax.imshow(binary_vecad, cmap="Greens")
         ax.axis("off")
-        ax.set_title("input image")
+        ax.set_title("%s cells" % row["green"])
         fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-ve_cad.png")
         plt.close()
 
-        thresh_orange = threshold_otsu(img_tile[:,:,2])
-        binary_orange = img_tile[:,:,2] > thresh_orange
+        thresh_orange = threshold_otsu(img_tile[:,:,parameters["channel_siRNA"]])
+        binary_orange = img_tile[:,:,parameters["channel_siRNA"]] > thresh_orange
 
         fig, ax = plt.subplots(figsize= (10,10))
         ax.imshow(binary_orange, cmap="Oranges")
         ax.axis("off")
-        ax.set_title("input image")
+        ax.set_title("%s cells" % row["orange"])
         fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-orange.png")
         plt.close()
 
@@ -195,14 +198,14 @@ for index, row in key_file.iterrows():
         fig, ax = plt.subplots(figsize= (10,10))
         ax.imshow(siScr_green , cmap="Greens")
         ax.axis("off")
-        ax.set_title("input image")
+        ax.set_title("nuclei , %s cells" % row["green"])
         fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-nuclei_green.png")
         plt.close()
 
         fig, ax = plt.subplots(figsize= (10,10))
         ax.imshow(siScr_orange , cmap="Oranges")
         ax.axis("off")
-        ax.set_title("input image")
+        ax.set_title("nuclei , %s cells" % row["orange"])
         fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-nuclei_orange.png")
         plt.close()
 
