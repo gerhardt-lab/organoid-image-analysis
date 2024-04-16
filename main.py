@@ -8,16 +8,14 @@ from skimage.filters import threshold_otsu
 from skimage.measure import label, regionprops, regionprops_table
 
 import matplotlib.pyplot as plt
-import skimage.io as io
 import argparse
-import os
 import sys
 import yaml
 import pandas as pd
 import numpy as np
-import seaborn as sns
 
 from utils.io import read_parameters
+from src.px_quant import pixel_quant
 
 
 #########################
@@ -80,59 +78,20 @@ key_file.to_csv(output_folder + "key_file.csv")
 results_df = pd.DataFrame()
 results_px_df = pd.DataFrame()
 
+
+results_px_df = pixel_quant(parameters)
+results_px_df.to_csv(parameters["output_folder"] + "results_px.csv", index = False)
+
 counter = 0
-counter_px = 0
+
 for index, row in key_file.iterrows():
-    print(row)
+
     filepath = parameters["input_folder"] + row["filename"]
     img = io.imread(filepath)
     print(img.shape)
-    img = img[:parameters["extend_y"], :parameters["extend_y"]]
 
     vertical_px = img.shape[0]
     vertical_px_tile = vertical_px // parameters["number_of_vertical_tiles"]
-
-    n_sample = parameters["n_sample"]
-    sample_counter = 0
-
-    thresh_vecad = threshold_otsu(img[:,:,parameters["channel_EC_junction"]])
-    binary_vecad = img[:,:,parameters["channel_EC_junction"]] > thresh_vecad
-
-    thresh_orange = threshold_otsu(img[:,:,parameters["channel_siRNA"]])
-    binary_orange = img[:,:,parameters["channel_siRNA"]] > thresh_orange
-
-    while sample_counter < n_sample:
-        x = np.random.randint(0, img.shape[1])
-        y = np.random.randint(0, img.shape[0])
-
-        if binary_orange[y,x]:
-            results_px_df.at[counter_px,"filename"] = row["filename"]
-            results_px_df.at[counter_px,"condition"] = row["condition"]
-            results_px_df.at[counter_px,"x"] = x
-            results_px_df.at[counter_px,"y"] = y
-            results_px_df.at[counter_px,"x_mum"] = x/parameters["pixel_to_micron_ratio"]
-            results_px_df.at[counter_px,"y_mum"] = y/parameters["pixel_to_micron_ratio"]
-            results_px_df.at[counter_px,"color"] = "orange"
-            results_px_df.at[counter_px,"siRNA"] = row["orange"]
-            
-            sample_counter += 1
-            counter_px += 1
-        elif binary_vecad[y,x]:
-            results_px_df.at[counter_px,"filename"] = row["filename"]
-            results_px_df.at[counter_px,"condition"] = row["condition"]
-            results_px_df.at[counter_px,"x"] = x
-            results_px_df.at[counter_px,"y"] = y
-            results_px_df.at[counter_px,"x_mum"] = x/parameters["pixel_to_micron_ratio"]
-            results_px_df.at[counter_px,"y_mum"] = y/parameters["pixel_to_micron_ratio"]
-            results_px_df.at[counter_px,"color"] = "green"
-            results_px_df.at[counter_px,"siRNA"] = row["green"]
-
-            sample_counter += 1
-            counter_px += 1
-        else:
-            continue     
-
-    results_px_df.to_csv(parameters["output_folder"] + "results_px.csv", index = False)
 
     for k in range(parameters["number_of_vertical_tiles"]):
         start_px = k*vertical_px_tile 
