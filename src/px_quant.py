@@ -5,36 +5,37 @@ from skimage.filters import threshold_otsu
 
 
 def pixel_quant(parameters):
-    
-    print("Nuclei segmentation")
+    """
+    Function to compute the pixel localization of the siRNA and vecad channels in the device.
+    """
+
     # load key file
     key_file = pd.read_csv(parameters["key_file"])
-    
+    # create empty dataframe to store results
     results_px_df = pd.DataFrame()
 
     counter_px = 0
-
     for index, row in key_file.iterrows():
+        
         print(row)
         filepath = parameters["input_folder"] + row["filename"]
         img = io.imread(filepath)
         print(img.shape)
-        img = img[:parameters["extend_y"], :parameters["extend_y"]]
-
-        n_sample = parameters["n_sample"]
-        sample_counter = 0
 
         thresh_vecad = threshold_otsu(img[:,:,parameters["channel_EC_junction"]])
         binary_vecad = img[:,:,parameters["channel_EC_junction"]] > thresh_vecad
 
-        thresh_orange = threshold_otsu(img[:,:,parameters["channel_siRNA"]])
-        binary_orange = img[:,:,parameters["channel_siRNA"]] > thresh_orange
+        thresh_siRNA = threshold_otsu(img[:,:,parameters["channel_siRNA"]])
+        binary_siRNA = img[:,:,parameters["channel_siRNA"]] > thresh_siRNA
 
+        n_sample = parameters["n_sample"]   # number of pixel samples to take per image
+        sample_counter = 0                  # counter to keep track of the number of pixel samples taken
         while sample_counter < n_sample:
             x = np.random.randint(0, img.shape[1])
             y = np.random.randint(0, img.shape[0])
 
-            if binary_orange[y,x]:
+            if binary_siRNA[y,x]:
+                #pixe
                 results_px_df.at[counter_px,"filename"] = row["filename"]
                 results_px_df.at[counter_px,"condition"] = row["condition"]
                 results_px_df.at[counter_px,"x"] = x
@@ -47,6 +48,7 @@ def pixel_quant(parameters):
                 sample_counter += 1
                 counter_px += 1
             elif binary_vecad[y,x]:
+                # pixel that is not siRNA but is vecad
                 results_px_df.at[counter_px,"filename"] = row["filename"]
                 results_px_df.at[counter_px,"condition"] = row["condition"]
                 results_px_df.at[counter_px,"x"] = x
