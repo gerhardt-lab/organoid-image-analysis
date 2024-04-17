@@ -15,11 +15,11 @@ from csbdeep.utils import normalize
 
 
 
-def nuclei_quant(parameters):
+def nuclei_quant(parameters, key_file):
     
     print("Nuclei segmentation")
     # load key file
-    key_file = pd.read_csv(parameters["key_file"])
+    #key_file = pd.read_csv(parameters["key_file"])
     model = StarDist2D.from_pretrained('2D_versatile_fluo')
     results_df = pd.DataFrame()
 
