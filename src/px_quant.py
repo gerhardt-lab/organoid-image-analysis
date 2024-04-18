@@ -22,6 +22,8 @@ def pixel_quant(parameters, key_file):
         img = io.imread(filepath)
         print(img.shape)
 
+        
+
         thresh_vecad = threshold_otsu(img[:,:,parameters["channel_EC_junction"]])
         binary_vecad = img[:,:,parameters["channel_EC_junction"]] > thresh_vecad
 

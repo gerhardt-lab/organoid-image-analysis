@@ -28,6 +28,13 @@ def nuclei_quant(parameters, key_file):
 
     for index, row in key_file.iterrows():
 
+        monolayer_end_px = row["monolayer_end_px"]
+        open_space_start_px = row["open_space_start_px"]
+        open_space_end_px = row["open_space_end_px"]
+        monolayer_end_um = int(monolayer_end_px/parameters["pixel_to_micron_ratio"])
+        open_space_start_um = int((open_space_start_px - monolayer_end_px)/parameters["pixel_to_micron_ratio"])
+        open_space_end_um = int((open_space_end_px - monolayer_end_px)/parameters["pixel_to_micron_ratio"])    
+
         filepath = parameters["input_folder"] + row["filename"]
         img = io.imread(filepath)
         print(img.shape)
@@ -112,7 +119,16 @@ def nuclei_quant(parameters, key_file):
                 for props in regions:
                     y0, x0 = props.centroid
                     area = props.area
+                    y0 += start_px 
                     print("x: ",x0, " y: ", y0, " area: ", area)
+
+                if parameters["filter_nuclei"]:
+                    if area < parameters["nuclei_min_area"]:
+                        print("Nuclei label mask below min area threshold")
+                        continue
+                    if area > parameters["nuclei_max_area"]:
+                        print("Nuclei label mask above max area threshold")
+                        continue
 
                 x_adjusted = x0 - row["monolayer_end_px"]
                 results_df.at[counter,"label"] = label
@@ -160,38 +176,37 @@ def nuclei_quant(parameters, key_file):
 
             results_df.to_csv(parameters["output_folder"] + "results_nuclei.csv", index = False)
     
-            plot_df = results_df[results_df["filename"] == row["filename"]]
-            fig, ax = plt.subplots(figsize = (9,6))
+        plot_df = results_df[results_df["filename"] == row["filename"]]
+        fig, ax = plt.subplots(figsize = (9,6))
 
-            sns.histplot(data=plot_df, x="x_adjusted_mum", hue="color", common_norm=False, binwidth = 100.0,
+        sns.histplot(data=plot_df, x="x_adjusted_mum", hue="color", common_norm=False, binwidth = 100.0,
+        fill = True, ax = ax, palette = {"orange" :"orange", "green": "green"})
+            
+        monolayer_end_um = 0.0 # row["monolayer_end_px"]/parameters["pixel_to_micron_ratio"]
+        open_space_start_um = (row["open_space_start_px"] - row["monolayer_end_px"])/parameters["pixel_to_micron_ratio"]
+        open_space_end_um = (row["open_space_end_px"]- row["monolayer_end_px"])/parameters["pixel_to_micron_ratio"]
+
+        ax.axvline(monolayer_end_um,  color='black')
+        ax.axvline(open_space_start_um, color='black')
+        ax.axvline(open_space_end_um, color='black')
+            
+        #plt.savefig(parameters["output_folder"] + row["filename"] + "-kde.pdf")
+        plt.savefig(parameters["output_folder"] + row["filename"] + "-nuclei-kde-with-monolayer.png")
+        plt.close()
+
+        plot_df = plot_df[plot_df["x_adjusted_mum"] > 0.0]
+        plot_df = plot_df[plot_df["x_adjusted_mum"] < open_space_end_um]       
+        fig, ax = plt.subplots(figsize = (9,6))
+
+        sns.histplot(data=plot_df, x="x_adjusted_mum", hue="color", common_norm=False, binwidth = 100.0,
                 fill = True, ax = ax, palette = {"orange" :"orange", "green": "green"})
+        #ax.axvline(monolayer_end_um,  color='black')
+        ax.axvline(open_space_start_um, color='black')
+        #ax.axvline(open_space_end_um, color='black')
             
-            monolayer_end_um = 0.0 # row["monolayer_end_px"]/parameters["pixel_to_micron_ratio"]
-            open_space_start_um = (row["open_space_start_px"] - row["monolayer_end_px"])/parameters["pixel_to_micron_ratio"]
-            open_space_end_um = (row["open_space_end_px"]- row["monolayer_end_px"])/parameters["pixel_to_micron_ratio"]
-
-            ax.axvline(monolayer_end_um,  color='black')
-            ax.axvline(open_space_start_um, color='black')
-            ax.axvline(open_space_end_um, color='black')
-            
-            #plt.savefig(parameters["output_folder"] + row["filename"] + "-kde.pdf")
-            plt.savefig(parameters["output_folder"] + row["filename"] + str(k) + "-nuclei-kde-with-monolayer.png")
-            plt.close()
-
-            plot_df = plot_df[plot_df["x_adjusted_mum"] > 0.0]
-            fig, ax = plt.subplots(figsize = (9,6))
-
-            sns.histplot(data=plot_df, x="x_adjusted_mum", hue="color", common_norm=False, binwidth = 100.0,
-                fill = True, ax = ax, palette = {"orange" :"orange", "green": "green"})
-            #ax.axvline(monolayer_end_um,  color='black')
-            ax.axvline(open_space_start_um, color='black')
-            ax.axvline(open_space_end_um, color='black')
-            
-            #plt.savefig(parameters["output_folder"] + row["filename"] + "-kde.pdf")
-            plt.savefig(parameters["output_folder"] + row["filename"] + str(k) + "-nuclei-kde.png")
-            plt.close()
-
-            results_df.to_csv(parameters["output_folder"] + "results_nuclei.csv", index = False)
+        #plt.savefig(parameters["output_folder"] + row["filename"] + "-kde.pdf")
+        plt.savefig(parameters["output_folder"] + row["filename"] + "-nuclei-kde.png")
+        plt.close()
 
     return results_df
 

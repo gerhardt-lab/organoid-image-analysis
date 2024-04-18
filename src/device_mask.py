@@ -83,12 +83,12 @@ def compute_device_regions(parameters,key_file):
         img_extend_um = int((label_mask.shape[1] - monolayer_end)/parameters["pixel_to_micron_ratio"])
         ax.set_xticks([0, monolayer_end, open_space_start, open_space_end, label_mask.shape[1]])
         ax.set_xticklabels([- monolayer_end_um, 0, open_space_start_um, open_space_end_um, img_extend_um])
-        ax.set_xlabel("Distance from monolayer end [um]")
+        ax.set_xlabel("distance from monolayer end [um]")
 
         img_extend_um = int(label_mask.shape[0]/parameters["pixel_to_micron_ratio"])
         ax.set_yticks([0, label_mask.shape[0]])
         ax.set_yticklabels([0, img_extend_um])
-        ax.set_xlabel("y in [um]")
+        ax.set_ylabel("y in [um]")
 
         #ax.vlines(open_space_start + monolayer_end, label_mask.shape[0]*0.05, label_mask.shape[0]*0.95, color='White')
         #ax.text(open_space_start + monolayer_end*1.5,label_mask.shape[0]*0.5, "region B",color="white", rotation = "vertical")
