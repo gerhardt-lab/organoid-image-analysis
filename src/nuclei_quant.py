@@ -9,7 +9,6 @@ from skimage.measure import label
 
 
 from stardist.models import StarDist2D
-from stardist.data import test_image_nuclei_2d
 from stardist.plot import render_label
 from csbdeep.utils import normalize
 
@@ -51,7 +50,7 @@ def nuclei_quant(parameters, key_file):
 
             # plot original image and stardist normalized image -------------------
 
-            img_nuclei = img_tile[:,:,0]
+            img_nuclei = img_tile[:,:,parameters["channel_nuclei"]]
             fig, ax = plt.subplots()
             ax.imshow(img_nuclei, cmap="Grays")
             ax.axis("off")
@@ -77,25 +76,27 @@ def nuclei_quant(parameters, key_file):
             plt.savefig(filepath_out)
             plt.close()
 
-            img_EC_vecad = gaussian(img_tile[:,:,parameters["channel_EC_junction"]], sigma = parameters["gaussian_sigma"])
+            img_EC_vecad = gaussian(img_tile[:,:,parameters["channel_EC_junction"]], 
+                                    sigma = parameters["gaussian_sigma"]["EC_junction"])
             thresh_vecad = threshold_otsu(img_EC_vecad)
             binary_vecad = img_EC_vecad > thresh_vecad
 
             fig, ax = plt.subplots(figsize= (10,10))
             ax.imshow(binary_vecad, cmap="Greens")
             ax.axis("off")
-            ax.set_title("%s cells" % row["green"])
+            ax.set_title("junction channel")
             fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-ve_cad.png")
             plt.close()
 
-            img_siRNA = gaussian(img_tile[:,:,parameters["channel_siRNA"]], sigma = parameters["gaussian_sigma"])
+            img_siRNA = gaussian(img_tile[:,:,parameters["channel_siRNA"]], 
+                                 sigma = parameters["gaussian_sigma"]["siRNA"])
             thresh_orange = threshold_otsu(img_siRNA)
             binary_orange = img_siRNA > thresh_orange
 
             fig, ax = plt.subplots(figsize= (10,10))
             ax.imshow(binary_orange, cmap="Oranges")
             ax.axis("off")
-            ax.set_title("%s cells" % row["orange"])
+            ax.set_title("mosaic label for %s" % row["orange"])
             fig.savefig(parameters["output_folder"] + row["filename"] + "-" + str(k) + "-orange.png")
             plt.close()
 

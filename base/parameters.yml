@@ -9,7 +9,7 @@ channel_siRNA: 2  # channel for siRNA marker, optional
 filter_nuclei: True  # if True, filter out nuclei based on size
 nuclei_max_area: 400  # threshold for nuclei segmentation
 nuclei_min_area: 100  # minimum size of nuclei in pixels
-nuclei_min_intensity: 0.1  # minimum mean vecad_intensity of nuclei
+nuclei_min_intensity: 0.0  # minimum mean vecad_intensity of nuclei
 
 # device geometry or setup
 
@@ -18,8 +18,8 @@ use_automated_segmentation: False # if True, use the segment anything model to s
 
 # segmentation_parameters
 
-gaussian_sigma: 2.0
-number_of_vertical_tiles: 3
+gaussian_sigma: {"EC_junction": 15.0, "siRNA": 5.0}
+number_of_vertical_tiles: 1
 
 extend_x: 5000
 extend_y: 5000
