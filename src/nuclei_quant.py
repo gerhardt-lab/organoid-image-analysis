@@ -115,12 +115,13 @@ def nuclei_quant(parameters, key_file):
                 single_nucleus = np.where(img_labels == label, 1, 0)
                 EC_nuclei += single_nucleus
 
-                regions = regionprops(single_nucleus)
+                regions = regionprops(single_nucleus, intensity_image=img_EC_vecad)
                 for props in regions:
                     y0, x0 = props.centroid
                     area = props.area
                     y0 += start_px 
-                    print("x: ",x0, " y: ", y0, " area: ", area)
+                    mean_intensity_vecad = props.intensity_mean
+                    print("x: ",x0, " y: ", y0, " area: ", area, " mean intensity: ", mean_intensity_vecad)
 
                 if parameters["filter_nuclei"]:
                     if area < parameters["nuclei_min_area"]:
@@ -128,6 +129,9 @@ def nuclei_quant(parameters, key_file):
                         continue
                     if area > parameters["nuclei_max_area"]:
                         print("Nuclei label mask above max area threshold")
+                        continue
+                    if mean_intensity_vecad < parameters["nuclei_min_intensity"]:
+                        print("Nuclei label mask below min intensity threshold")
                         continue
 
                 x_adjusted = x0 - row["monolayer_end_px"]
@@ -138,6 +142,7 @@ def nuclei_quant(parameters, key_file):
                 results_df.at[counter,"x_adjusted_mum"] = x_adjusted/parameters["pixel_to_micron_ratio"]
                 results_df.at[counter,"y_mum"] = y0/parameters["pixel_to_micron_ratio"]
                 results_df.at[counter,"nuclei_area"] = area
+                results_df.at[counter,"mean_intensity_vecad"] = mean_intensity_vecad
                 if label in np.unique(EC_nuclei_labels_siRNA_orange):
                     results_df.at[counter,"color"] = "orange"
                     results_df.at[counter,"siRNA"] = row["orange"]
