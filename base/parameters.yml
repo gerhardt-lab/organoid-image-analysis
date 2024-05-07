@@ -18,8 +18,15 @@ use_automated_segmentation: False # if True, use the segment anything model to s
 
 # segmentation_parameters
 
-gaussian_sigma: {"EC_junction": 15.0, "siRNA": 5.0}
+gaussian_sigma: {"EC_junction": 5.0, "siRNA": 5.0}
 number_of_vertical_tiles: 1
+
+
+# network parameters
+
+distance_px: 100  # max distance in pixels for an edge to be included in the network graph
+
+
 
 extend_x: 5000
 extend_y: 5000
