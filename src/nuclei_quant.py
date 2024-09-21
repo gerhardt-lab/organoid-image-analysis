@@ -7,12 +7,9 @@ import seaborn as sns
 from skimage.measure import regionprops
 from skimage.measure import label
 
-
 from stardist.models import StarDist2D
 from stardist.plot import render_label
 from csbdeep.utils import normalize
-
-
 
 
 def nuclei_quant(parameters, key_file):
@@ -116,6 +113,10 @@ def nuclei_quant(parameters, key_file):
                 single_nucleus = np.where(img_labels == label, 1, 0)
                 EC_nuclei += single_nucleus
 
+                regions = regionprops(single_nucleus, intensity_image=img_siRNA)
+                for props in regions:
+                    mean_intensity_siRNA = props.intensity_mean
+
                 regions = regionprops(single_nucleus, intensity_image=img_EC_vecad)
                 for props in regions:
                     y0, x0 = props.centroid
@@ -144,6 +145,10 @@ def nuclei_quant(parameters, key_file):
                 results_df.at[counter,"y_mum"] = y0/parameters["pixel_to_micron_ratio"]
                 results_df.at[counter,"nuclei_area"] = area
                 results_df.at[counter,"mean_intensity_vecad"] = mean_intensity_vecad
+                results_df.at[counter,"mean_intensity_siRNA_label"] = mean_intensity_siRNA
+                results_df.at[counter,"monolayer_end_px"] = monolayer_end_px
+                results_df.at[counter,"open_space_start_px"] = open_space_start_px 
+                results_df.at[counter,"open_space_end_px"] = open_space_end_px 
                 if label in np.unique(EC_nuclei_labels_siRNA_orange):
                     results_df.at[counter,"color"] = "orange"
                     results_df.at[counter,"siRNA"] = row["orange"]

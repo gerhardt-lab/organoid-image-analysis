@@ -73,16 +73,16 @@ with open(output_folder + "/parameters.yml", 'w') as outfile:
 ### stardist segmentation
     
 key_file = pd.read_csv(parameters["key_file"])
-#key_file.to_csv(output_folder + "key_file.csv")
+key_file.to_csv(output_folder + "key_file.csv")
 
-#key_file = compute_device_regions(parameters, key_file)
-#key_file.to_csv(output_folder + "key_file.csv")
+key_file = compute_device_regions(parameters, key_file)
+key_file.to_csv(output_folder + "key_file.csv")
 
-#results_px_df = pixel_quant(parameters, key_file)
-#results_px_df.to_csv(parameters["output_folder"] + "results_px.csv", index = False)
+results_px_df = pixel_quant(parameters, key_file)
+results_px_df.to_csv(parameters["output_folder"] + "results_px.csv", index = False)
 
-#results_nuclei_df = pd.DataFrame()
-#results_nuclei_df = nuclei_quant(parameters, key_file)
+results_nuclei_df = pd.DataFrame()
+results_nuclei_df = nuclei_quant(parameters, key_file)
 
 extract_connected_components(parameters=parameters, key_file=key_file)
 
