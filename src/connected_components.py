@@ -11,7 +11,45 @@ from skimage.measure import label
 from stardist.models import StarDist2D
 from stardist.plot import render_label
 from csbdeep.utils import normalize
+
+from griottes.graphmaker import graph_generation_func
+from griottes import get_cell_properties, generate_delaunay_graph, generate_geometric_graph, plot_2D
+from griottes.graphplotter import graph_plot
 import networkx as nx
+
+
+def generate_graph(parameters, key_file):
+
+    output_folder = parameters["output_folder"]
+    distance_px = parameters["distance_px"]
+    nuclei_data = pd.read_csv(output_folder + "results_nuclei.csv")
+
+    descriptors = ["label", "x", "y"]
+
+    for filename in nuclei_data["filename"].unique():
+        data = nuclei_data[nuclei_data["filename"] == filename]
+        G_delaunay = generate_delaunay_graph(data[descriptors],
+                                descriptors = descriptors,
+                                distance=distance_px,
+                                image_is_2D = True)
+    
+        graph_plot.network_plot_2D(G_delaunay,
+                figsize = (15,15),
+                alpha_line = 1,
+                scatterpoint_size = 2,
+                #background_image = img_labels,
+                #weights = False,
+                edge_color = 'k',
+                line_factor = 0.15)
+
+        plt.show()
+
+#plt.tight_layout()
+#        graph_plot(G_delaunay, output_folder + "delaunay_graph.png")
+#    
+#        plt.savefig(output_folder + filename + "_connected_components.png")
+#        # Show the plot
+#        plt.show()
 
 
 def extract_connected_components(parameters, key_file):
