@@ -14,18 +14,18 @@ nuclei_min_intensity: 0.0  # minimum mean vecad_intensity of nuclei
 # device geometry or setup
 
 use_automated_segmentation: False # if True, use the segment anything model to segment the device geometry, if False, create a binary mask of the device geometry and add _device_mask to the filename before the filename extension. Example file.tif -> add file_device_mask.tif
-
+monolayer_width: 250 # width of the monolayer in microns
 
 # segmentation_parameters
 
-gaussian_sigma: {"EC_junction": 3.0, "siRNA": 3.0}
+gaussian_sigma: {"EC_junction": 3.0, "siRNA": 0.5}
 number_of_vertical_tiles: 1
 
 
 # network parameters
 
 distance_px: 100  # max distance in pixels for an edge to be included in the network graph
-
+min_size_component: 100  # minimum size of a connected component in the network graph
 
 
 extend_x: 5000
